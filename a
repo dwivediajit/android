@@ -1,0 +1,272 @@
+public class MainActivity extends AppCompatActivity {
+    Button btn,db;
+    EditText et1,et2,d1,d2;
+
+    SQLiteDatabase data;
+    @SuppressLint({"SetTextI18n", "MissingInflatedId"})
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("lifecycle", "onCreate: invoke");
+        setContentView(R.layout.activity_main);
+        btn=findViewById(R.id.submit);
+        et1=findViewById(R.id.user_name);
+        et2=findViewById(R.id.pass_word);
+        date_btn=findViewById(R.id.datepick);
+        time_btn=findViewById(R.id.timepick);
+        date_et=findViewById(R.id.date_piker);
+        time_et=findViewById(R.id.time_piker);
+        d1=findViewById(R.id.inputname);
+        d2=findViewById(R.id.pass_input);
+
+        date_btn.setOnClickListener(this::onClick);
+        time_btn.setOnClickListener(this::onClick);
+
+        //login form
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (et1.getText().toString().equals("admin") && et2.getText().toString().equals("admin")){
+                    Toast.makeText(getApplicationContext(),"loged in",Toast.LENGTH_LONG).show();
+                }else {
+                    Toast.makeText(getApplicationContext(),"not loged in",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        TextView tv = findViewById(R.id.net);
+// Check internet connectivity
+        if (isConnected()) {
+            tv.setText("Internet Connected");
+        } else {
+            tv.setText("No Internet Connection");
+        }
+
+        //sqlite database
+        data=openOrCreateDatabase("mydb",MODE_PRIVATE,null);
+        data.execSQL("create table if not exists mytable(name varchar,pass varchar)");
+    }
+
+    //lifecycle
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("lifecycle", "onStart: invoke ");
+    }
+
+    //date time picker
+    Button date_btn,time_btn;
+    EditText date_et,time_et;
+    Calendar cal;
+
+    int y,n,m,H,M;
+    public void onClick(View v) {
+        if (v == date_btn) {
+            cal = Calendar.getInstance();
+            y = cal.get(Calendar.YEAR);
+            m = cal.get(Calendar.MONTH);
+            n = cal.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePicker = new DatePickerDialog(this,
+                    new DatePickerDialog.OnDateSetListener() {
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            // Set the selected date to the EditText
+                            date_et.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                        }
+                    }, y, m, n);
+
+            // Show the DatePickerDialog
+            datePicker.show();
+            Toast.makeText(getApplicationContext(),"date",Toast.LENGTH_SHORT).show();
+        };
+        if (v == time_btn) {
+            cal = Calendar.getInstance();
+            H= cal.get(Calendar.HOUR_OF_DAY);
+            M=cal.get(Calendar.MINUTE);
+
+            TimePickerDialog datePicker = new TimePickerDialog(this,
+                    new TimePickerDialog.OnTimeSetListener() {
+
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                            time_et.setText(hourOfDay+":"+minute);
+                        }},H,M,false);
+
+            // Show the DatePickerDialog
+            datePicker.show();
+            Toast.makeText(getApplicationContext(),"time",Toast.LENGTH_SHORT).show();
+        };
+    }
+
+    //option menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.option_menu,menu);
+        return true;
+    }
+
+
+
+
+    @SuppressLint("NonConstantResourceId")
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int idt=item.getItemId();
+        // Handle item selection
+        if ( idt== R.id.search) {
+            Toast.makeText(getApplicationContext(), "Item 1 selected", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (idt==R.id.find) {
+            Toast.makeText(getApplicationContext(), "Item 2 selected", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    //net method
+    private boolean isConnected(){
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        }
+        return false;
+    }
+
+    //database insert query
+    public void insert(View view) {
+        String name=d1.getText().toString();
+        String pass=d2.getText().toString();
+        d1.setText(" ");
+        d2.setText(" ");
+        data.execSQL("insert into mytable values('"+name+"','"+pass+"')");
+        Toast.makeText(getApplicationContext(),"done",Toast.LENGTH_SHORT).show();
+    }
+}
+
+
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/search"
+        android:title="Item1"
+        tools:ignore="HardcodedText" />
+    <item
+        android:id="@+id/find"
+        android:title="Item"
+        tools:ignore="HardcodedText"/>
+</menu>
+
+/option menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.option_menu,menu);
+        return true;
+    }
+
+
+
+
+    @SuppressLint("NonConstantResourceId")
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int idt=item.getItemId();
+        // Handle item selection
+        if ( idt== R.id.search) {
+            Toast.makeText(getApplicationContext(), "Item 1 selected", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (idt==R.id.find) {
+            Toast.makeText(getApplicationContext(), "Item 2 selected", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+table
+
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="1">
+
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="Open..."
+            android:padding="3dip" />
+        <TextView
+            android:text="Ctrl-O"
+            android:gravity="right"
+            android:padding="3dip" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="Save..."
+            android:padding="3dip" />
+        <TextView
+            android:text="Ctrl-S"
+            android:gravity="right"
+            android:padding="3dip" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="Save As..."
+            android:padding="3dip" />
+        <TextView
+            android:text="Ctrl-Shift-S"
+            android:gravity="right"
+            android:padding="3dip" />
+    </TableRow>
+
+    <View
+        android:layout_height="2dip"
+        android:background="#FF909090" />
+
+    <TableRow>
+        <TextView
+            android:text="X"
+            android:padding="3dip" />
+        <TextView
+            android:text="Import..."
+            android:padding="3dip" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:text="X"
+            android:padding="3dip" />
+        <TextView
+            android:text="Export..."
+            android:padding="3dip" />
+        <TextView
+            android:text="Ctrl-E"
+            android:gravity="right"
+            android:padding="3dip" />
+    </TableRow>
+
+    <View
+        android:layout_height="2dip"
+        android:background="#FF909090" />
+
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="Quit"
+            android:padding="3dip" />
+    </TableRow>
+</TableLayout>
